@@ -1,0 +1,9 @@
+#word-blanks {
+    letter-spacing: 5px;
+}
+
+#wrong-guesses {
+    letter-spacing: 5px;
+    font-size: 20px;
+    color: red;
+}
