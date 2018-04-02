@@ -1,101 +1,143 @@
-// global variables
-
-var countries = [];   
-countries[0] = {name: "new zealand", hint: "Lots of sheep!"};
-
-countries[1] = {name: "russia", hint: "hand me some vodka!"};
-
-countries[2] = {name: "united states of america", hint: "tide pods are on every menu!"};
-
-countries[3] = {name: "saudi arabia", hint: "land of oil and headwear"};
-
-countries[4] = {name: "germany", hint: "dont be a braut, your the werst (lol?)"};
-
-countries[5] = {name: "zimbabwe", hint: "no hint, good luck!"};
-
-var countryName;
-var lettersGuessed;
-var randomCountry;
-var pickedCountry;
-var countryLength
-var countrySubstring
-var placeholder;
-var wins = 0;
-var losses = 0;
-var guessesLeft;
-var hint;
-var key;
 
 
-function newGame() {
-    placeholder = "";
-    guessesLeft = 8;
-    lettersGuessed = [];
-    randomCountry = Math.floor(Math.random() * countries.length);
-    pickedCountry = countries.splice(randomCountry, 1);
-    countryName = pickedCountry[0].name;
-    hint = pickedCountry[0].hint;
-    countryLength = countryName.length;
-    countrySubstring = countryName.substring;
+var wordsList = ["jerome", "neena", "darion", "lou", "greg", "jordan",
+  "jasmine", "stephen", "jacob", "adam", "rui", "luis"];
 
-    for (var i = 0; i < countryName.length; i++) {
+var chosenWord = "";
 
-    if (countryName.substring(i, i + 1) === " ") {
+var lettersInChosenWord = [];
 
-            placeholder = placeholder + " ";
-        }
-    
-    else {
-            placeholder = placeholder + "_";
-        }
+var numBlanks = 0;
 
- }
+var blanksAndSuccesses = [];
 
-    document.querySelector("#win-counter").innerHTML = wins;
-    document.querySelector("#loss-counter").innerHTML = losses;
-    document.querySelector("#word-blanks").innerHTML = placeholder;
-    document.querySelector("#wrong-guesses").innerHTML = lettersGuessed;
-    document.querySelector("#guesses-left").innerHTML = guessesLeft;
-    
+var wrongGuesses = [];
+
+var winCounter = 0;
+var lossCounter = 0;    
+var numGuesses = 9;
+
+
+
+
+function startGame() {
+ 
+  numGuesses = 9;
+
+
+  chosenWord = wordsList[Math.floor(Math.random() * wordsList.length)];
+ 
+  lettersInChosenWord = chosenWord.split("");
+
+  numBlanks = lettersInChosenWord.length;
+
+
+  console.log(chosenWord);
+
+  blanksAndSuccesses = [];
+
+  wrongGuesses = [];
+
+
+  for (var i = 0; i < numBlanks; i++) {
+    blanksAndSuccesses.push("_");
+  }
+
+ 
+  console.log(blanksAndSuccesses);
+
+
+
+  document.getElementById("guesses-left").innerHTML = numGuesses;
+
+ 
+  document.getElementById("word-blanks").innerHTML = blanksAndSuccesses.join(" ");
+
+
+  document.getElementById("wrong-guesses").innerHTML = wrongGuesses.join(" ");
 }
 
-    newGame();
 
-    document.onkeyup = function(event) {
-        key = event.key;
+function checkLetters(letter) {
 
-        var correct = 0;
-        //checking for correct guesses when clicked
-        for (var i = 0; i < countryLength; i++) {
-           if (key == countryName.substring(i, i + 1)) {
-                correct++;
-                placeholder = placeholder.substring(0, 1) + key + placeholder.substring(i + 1, placeholder.length + 1);
-                document.querySelector("#word-blanks").innerHTML = placeholder;
-           }
-        } 
+ 
+  var letterInWord = false;
 
-    //wrong guesses
-
-        if (correct == 0) {
-            guessesLeft--;
-            lettersGuessed.push(key);
-            document.querySelector("#guesses-left").innerHTML = guessesLeft;
-            document.querySelector("#wrong-guesses").innerHTML = lettersGuessed;
-        }
-    //if you win
-
-        if (placeholder == countryName) {
-            wins++;
-            alert("you big winner! The answer is " + countryName);
-            document.querySelector("#win-counter").innerHTML = wins;
-        }
-    //if you lose
-        if (guessesLeft == 0) {
-            losses++;
-            alert("you lost, dummy! The answer is " + countryName);
-            document.querySelector("#loss-counter").innerHTML = losses;
-          }
-
+ 
+  for (var i = 0; i < numBlanks; i++) {
+    if (chosenWord[i] === letter) {
+  
+      letterInWord = true;
     }
-    //new game
-    document.querySelector("#button").addEventListener("click", newGame);
+  }
+
+
+  if (letterInWord) {
+
+  
+    for (var j = 0; j < numBlanks; j++) {
+
+
+      if (chosenWord[j] === letter) {
+      
+        blanksAndSuccesses[j] = letter;
+      }
+    }
+  
+    console.log(blanksAndSuccesses);
+  }
+ 
+  else {
+   
+    wrongGuesses.push(letter);
+    numGuesses--;
+  }
+}
+
+
+function roundComplete() {
+
+
+  console.log("WinCount: " + winCounter + " | LossCount: " + lossCounter + " | NumGuesses: " + numGuesses);
+
+ 
+  document.getElementById("guesses-left").innerHTML = numGuesses;
+
+  document.getElementById("word-blanks").innerHTML = blanksAndSuccesses.join(" ");
+
+  document.getElementById("wrong-guesses").innerHTML = wrongGuesses.join(" ");
+
+ 
+  if (lettersInChosenWord.toString() === blanksAndSuccesses.toString()) {
+ 
+    winCounter++;
+    alert("You win!");
+
+   
+    document.getElementById("win-counter").innerHTML = winCounter;
+    startGame();
+  }
+
+ 
+  else if (numGuesses === 0) {
+    
+    lossCounter++;
+
+    alert("You lose");
+
+ 
+    document.getElementById("loss-counter").innerHTML = lossCounter;
+   
+    startGame();
+  }
+
+}
+
+startGame();
+
+document.onkeyup = function(event) {
+   var letterGuessed = String.fromCharCode(event.which).toLowerCase();
+    checkLetters(letterGuessed);
+    roundComplete();
+};
+
